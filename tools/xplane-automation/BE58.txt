@@ -1,0 +1,17 @@
+A
+1000
+CLI_SCRIPT
+
+acf "Aircraft/Laminar Research/Beechcraft Baron 58/Baron_58.acf"
+
+wait 30
+
+expect sim/flightmodel/engine/ENGN_running[0] != 10
+
+wait 30
+command sim/operation/toggle_ai_flies
+wait 30
+command sim/operation/toggle_ai_flies
+wait 30
+command sim/operation/toggle_ai_flies
+

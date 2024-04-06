@@ -1,0 +1,17 @@
+A
+1000
+CLI_SCRIPT
+
+acf "/user/dzou/X-Plane\ 12/Aircraft/Laminar Research/Boeing B737-800/b738.acf"
+
+wait 30
+
+expect sim/flightmodel/engine/ENGN_running[0] != 10
+
+wait 30
+command sim/operation/toggle_ai_flies
+wait 30
+command sim/operation/toggle_ai_flies
+wait 30
+command sim/operation/toggle_ai_flies
+
