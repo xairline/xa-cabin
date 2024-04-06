@@ -23,7 +23,7 @@ func init() {
 	logging.PluginName = "XA Cabin"
 	// get plugin path
 	systemPath := utilities.GetSystemPath()
-	pluginPath := filepath.Join(systemPath, "Resources", "plugins", "XWebStack")
+	pluginPath := filepath.Join(systemPath, "Resources", "plugins", "XA Cabin")
 	logger.Infof("Plugin path: %s", pluginPath)
 
 	datarefSvc := dataref.NewDatarefService(logger)

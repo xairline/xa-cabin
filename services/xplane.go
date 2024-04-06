@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/xairline/goplane/extra"
+	"github.com/xairline/goplane/xplm/menus"
 	"github.com/xairline/goplane/xplm/processing"
-	"github.com/xairline/goplane/xplm/utilities"
 	"gorm.io/gorm"
 	"net/http"
 	"net/url"
@@ -38,8 +38,6 @@ type xplaneService struct {
 var xplaneSvcLock = &sync.Mutex{}
 var xplaneSvc XplaneService
 
-var commands = []string{}
-
 func NewXplaneService(
 	datarefSvc dataref.DatarefService,
 	flightStatusSvc flight_status.FlightStatusService,
@@ -53,7 +51,7 @@ func NewXplaneService(
 		xplaneSvcLock.Lock()
 		defer xplaneSvcLock.Unlock()
 		xplaneSvc := xplaneService{
-			Plugin:              extra.NewPlugin("X Web Stack", "com.github.xairline.xwebstack", "A plugin enables Frontend developer to contribute to xplane"),
+			Plugin:              extra.NewPlugin("XA Cabin", "com.github.xairline.xa-cabin", "Cabin Announcement System for X-Plane"),
 			DatarefSvc:          datarefSvc,
 			FlightStatusService: flightStatusSvc,
 			Logger:              logger,
@@ -78,6 +76,16 @@ func (s xplaneService) onPluginStateChanged(state extra.PluginState, plugin *ext
 
 func (s xplaneService) onPluginStart() {
 	s.Logger.Info("Plugin started")
+	// create menu
+	menuId := menus.AppendMenuItem(menus.FindPluginsMenu(), "XA Cabin", 0, false)
+	myMenudId := menus.CreateMenu("XA Cabin", menus.FindPluginsMenu(), menuId, func(menuRef, itemRef interface{}) {
+		s.Logger.Infof("Menu item selected: %v", itemRef)
+	}, nil)
+	menus.AppendMenuItem(myMenudId, "Control Panel",
+		"Control Panel Ref", false)
+	menus.AppendMenuSeparator(myMenudId)
+	menus.AppendMenuItem(myMenudId, "Configuration",
+		"Configuration Ref", false)
 	processing.RegisterFlightLoopCallback(s.flightLoop, -1, nil)
 }
 
@@ -86,13 +94,6 @@ func (s xplaneService) onPluginStop() {
 }
 
 func (s xplaneService) flightLoop(elapsedSinceLastCall, elapsedTimeSinceLastFlightLoop float32, counter int, ref interface{}) float32 {
-	if len(commands) != 0 {
-		command := commands[len(commands)-1]
-		commands = commands[:len(commands)-1]
-		cmdRef := utilities.FindCommand(command)
-		utilities.CommandOnce(cmdRef)
-		s.Logger.Infof("Command: %+v executed", cmdRef)
-	}
 	datarefValues := s.DatarefSvc.GetCurrentValues()
 	return s.FlightStatusService.ProcessDataref(datarefValues)
 }
